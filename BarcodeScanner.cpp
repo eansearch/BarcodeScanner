@@ -350,7 +350,7 @@ void BarcodeScanner::EANLookup(const QString & ean) {
         productInfo->setText("EAN " + ean + "<br>No API token for name lookup");
     } else {
         QNetworkRequest request = QNetworkRequest(QUrl("https://api.ean-search.org/api?token=" + token + "&format=json&op=barcode-lookup&ean=" + ean));
-        QNetworkReply* reply = network_manager.get(request);
+        QNetworkReply * reply = network_manager.get(request);
         // connect to signal when its done using lambda
         QObject::connect(reply, &QNetworkReply::finished, [=]() {
             QString ReplyText = reply->readAll();
