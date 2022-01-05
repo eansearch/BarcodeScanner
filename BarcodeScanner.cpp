@@ -351,13 +351,18 @@ void BarcodeScanner::EANLookup(const QString & ean) {
     } else {
         QNetworkRequest request = QNetworkRequest(QUrl("https://api.ean-search.org/api?token=" + token + "&format=json&op=barcode-lookup&ean=" + ean));
         QNetworkReply * reply = network_manager.get(request);
+        request.setRawHeader("User-Agent", "BarcodeScanner (Qt)");
         // connect to signal when its done using lambda
         QObject::connect(reply, &QNetworkReply::finished, [=]() {
             QString ReplyText = reply->readAll();
             reply->deleteLater(); // clean up
+            if (ReplyText.contains("error") && ReplyText.contains("Invalid token")) {
+                productInfo->setText("EAN " + ean + "<br>Invalid <a href='https://www.ean-search.org/ean-database-api.html'>API</a> token");
+                eanSearchToken->setText("");
+                return;
+            }
             QJsonDocument doc = QJsonDocument::fromJson(ReplyText.toUtf8());
-            QJsonArray arr = doc.array();
-            QJsonValue obj0 = arr[0];
+            QJsonValue obj0 = doc.array()[0];
             QString name = obj0[QString("name")].toString();
             productInfo->setText("EAN " + ean + "<br><a href='https://www.ean-search.org/ean/" + ean + "'>" + name + "</a>");
         });
