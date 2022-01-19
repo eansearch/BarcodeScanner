@@ -33,6 +33,10 @@
 BarcodeScanner::BarcodeScanner(QWidget *parent)
 	: QDialog(parent)
 {
+	pipeline = NULL;
+	bus = NULL;
+	gst_event_timer = NULL;
+
     settings = new QSettings("ean-search.org", "BarcodeScanner");
 	// Qt dialog init
 	camera = new QComboBox();
